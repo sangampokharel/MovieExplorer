@@ -1,0 +1,56 @@
+disabled_rules:
+  - trailing_whitespace
+
+opt_in_rules:
+  - array_init
+  - closure_end_indentation
+  - closure_spacing
+  - contains_over_filter_is_empty
+  - empty_count
+  - empty_string
+  - explicit_init
+  - extension_access_modifier
+  - first_where
+  - implicit_return
+  - joined_default_parameter
+  - legacy_random
+  - legacy_objc_type
+  - multiline_arguments
+  - operator_usage_whitespace
+  - overridden_super_call
+  - pattern_matching_keywords
+  - prefer_self_in_static_references
+  - prefer_self_type_over_type_of_self
+  - private_action
+  - private_outlet
+  - redundant_type_annotation
+  - sorted_imports
+  - static_operator
+  - strong_iboutlet
+  - toggle_bool
+  - unowned_variable_capture
+  - vertical_whitespace
+
+line_length:
+  warning: 140
+  error: 180
+
+type_body_length:
+  warning: 300
+  error: 450
+
+function_body_length:
+  warning: 60
+  error: 100
+
+cyclomatic_complexity:
+  warning: 12
+  error: 20
+
+identifier_name:
+  allowed_symbols: ["i", "j", "x", "y", "id"]
+
+excluded:
+  - .git
+  - Pods
+  - Carthage
