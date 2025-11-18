@@ -9,25 +9,57 @@ import UIKit
 
 class MovieListController: UIViewController {
 
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.separatorStyle = .none
+        tableView.separatorInset = .zero
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        return tableView
+    }()
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        title = "Movie Explorer"
         setupUI()
+        setNavBar()
     }
 
     private func setupUI() {
-        // Add your UI elements here
-        let label = UILabel()
-        label.text = "Welcome to Movie Explorer"
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(label)
-
+        view.backgroundColor = .systemBackground
+        title = "Movies"
+        view.addSubview(tableView)
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.identifier)
+
+    }
+
+    private func setNavBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+
+}
+
+extension MovieListController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.identifier, for: indexPath)
+        return cell
+    }
+}
+
+extension MovieListController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+        print("TableView Selected \(indexPath)")
     }
 }
