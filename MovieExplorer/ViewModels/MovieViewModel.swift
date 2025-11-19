@@ -13,7 +13,7 @@ class MovieViewModel: ObservableObject {
 
     @Published private(set) var movies: [MovieModel] = []
     @Published private(set) var isLoading: Bool?
-    @Published private(set) var movie:MovieModel?
+    @Published private(set) var movie:MovieDetailModel?
     private var movieService:MovieServiceProtocol?
 
     init(movieService:MovieServiceProtocol? = nil) {
@@ -40,8 +40,8 @@ class MovieViewModel: ObservableObject {
         isLoading = true
         Task {
             do {
-                guard let movieDTO = try await movieService?.fetchMovieDetail(id: id) else { return }
-                self.movie = MovieModel.init(movieDto: movieDTO)
+                guard let movieDetailDTO = try await movieService?.fetchMovieDetail(id: id) else { return }
+                self.movie = MovieDetailModel.init(movieDetailDTO: movieDetailDTO)
                 isLoading = false
             }catch {
                 isLoading = false

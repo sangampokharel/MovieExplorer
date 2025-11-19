@@ -39,12 +39,6 @@ class MovieDetailsController: UIViewController {
         return stackView
     }()
 
-    private lazy var titleLabel:UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 18,weight: .regular)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
 
     private lazy var activityIndicator:UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
@@ -54,9 +48,44 @@ class MovieDetailsController: UIViewController {
         return activityIndicator
     }()
 
+
+    private lazy var titleLabel:UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18,weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
     private lazy var subTitleLabel:UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 18,weight: .regular)
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var popularityLabel:UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18,weight: .regular)
+        label.textColor = .systemGreen
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var releaseDateLabel:UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18,weight: .regular)
+        label.textColor = .systemBlue
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var watchDurationLabel:UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18,weight: .regular)
+        label.textColor = .orange
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -106,7 +135,10 @@ class MovieDetailsController: UIViewController {
         containerView.addSubview(imgView)
         containerView.addSubview(labelStackView)
         labelStackView.addArrangedSubview(titleLabel)
+        labelStackView.addArrangedSubview(popularityLabel)
         labelStackView.addArrangedSubview(subTitleLabel)
+        labelStackView.addArrangedSubview(releaseDateLabel)
+        labelStackView.addArrangedSubview(watchDurationLabel)
 
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -135,11 +167,14 @@ class MovieDetailsController: UIViewController {
         ])
     }
 
-    private func config(movie:MovieModel) {
-        titleLabel.text = movie.movieName
-        subTitleLabel.text = movie.movieDescription
-        imgView.loadImage(from: movie.imageUrl)
-        title = movie.movieName
+    private func config(movie:MovieDetailModel) {
+        titleLabel.text = "Language: \(movie.originalLanguage)"
+        subTitleLabel.text = movie.overview
+        popularityLabel.text = movie.popularity
+        releaseDateLabel.text = movie.releaseDate
+        watchDurationLabel.text = movie.duration
+        imgView.loadImage(from: movie.posterPath)
+        title = movie.title
     }
 }
 

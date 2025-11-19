@@ -8,14 +8,12 @@
 import Foundation
 
 protocol MovieServiceProtocol {
-    func fetchMovies() async throws -> [MovieDTOs]
-    func fetchMovieDetail(id:Int) async throws -> MovieDTOs
+    func fetchMovies() async throws -> [MovieDTO]
+    func fetchMovieDetail(id:Int) async throws -> MovieDetailDTO
 }
 
 class MovieService: MovieServiceProtocol {
-
-
-    func fetchMovies() async throws -> [MovieDTOs] {
+    func fetchMovies() async throws -> [MovieDTO] {
         guard let url = URL(string: Constants.movieListURL) else {
             throw NetworkError.invalidUrl
         }
@@ -32,7 +30,7 @@ class MovieService: MovieServiceProtocol {
         }
     }
 
-    func fetchMovieDetail(id: Int) async throws -> MovieDTOs {
+    func fetchMovieDetail(id: Int) async throws -> MovieDetailDTO {
         guard let url = URL(string: Urls.getMovieDetailUrl(id: id)) else {
             throw NetworkError.invalidUrl
         }
@@ -41,7 +39,7 @@ class MovieService: MovieServiceProtocol {
         urlRequest.setValue("Bearer \(Constants.apiToken)", forHTTPHeaderField: "Authorization")
         do {
             let (data, _ ) = try await URLSession.shared.data(for: urlRequest)
-            let movie = try JSONDecoder().decode(MovieDTOs.self, from: data)
+            let movie = try JSONDecoder().decode(MovieDetailDTO.self, from: data)
             return movie
         }catch {
             print(error.localizedDescription)

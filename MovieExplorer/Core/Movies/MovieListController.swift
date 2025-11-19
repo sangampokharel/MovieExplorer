@@ -42,7 +42,6 @@ class MovieListController: UIViewController {
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        title = "Movies"
         view.addSubview(tableView)
         view.addSubview(activityIndicator)
 
@@ -59,6 +58,7 @@ class MovieListController: UIViewController {
 
     private func setNavBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
+        title = "Movies"
     }
 
     private func observeChanges() {

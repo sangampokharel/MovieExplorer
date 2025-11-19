@@ -9,7 +9,7 @@ import Foundation
 
 struct MovieResponse: Decodable {
     let page:Int?
-    let results: [MovieDTOs]?
+    let results: [MovieDTO]?
     let totalPage:Int?
     let totalResults:Int?
 
@@ -23,7 +23,7 @@ struct MovieResponse: Decodable {
     init(from decoder:Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         page = try? values.decode(Int.self, forKey: .page)
-        results = try? values.decode([MovieDTOs].self, forKey: .results)
+        results = try? values.decode([MovieDTO].self, forKey: .results)
         totalPage = try? values.decode(Int.self, forKey: .totalPage)
         totalResults = try? values.decode(Int.self, forKey: .totalResult)
     }

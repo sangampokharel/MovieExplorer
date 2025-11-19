@@ -18,7 +18,7 @@ struct MovieModel {
         self.movieDescription = movieDescription
     }
 
-    init(movieDto:MovieDTOs) {
+    init(movieDto:MovieDTO) {
         self.id = movieDto.id ?? 0
         self.movieName = movieDto.title ?? ""
         self.movieDescription = movieDto.overview ?? ""
