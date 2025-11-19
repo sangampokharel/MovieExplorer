@@ -4,6 +4,7 @@
 //
 //  Created by Ekbana on 19/11/2025.
 //
+import Foundation
 
 struct MovieDetailDTO: Decodable {
     let id:Int?
@@ -44,17 +45,36 @@ struct MovieDetailDTO: Decodable {
 
     var popularityCalculated:String {
         guard let popularity else { return ""}
-        return "Popularity: \(popularity) %"
+        return String(format: "Popularity: %.2f %%", popularity)
     }
 
     var formattedReleaseDate:String {
         guard let releaseDate else { return ""}
-        return "Release Date: \(releaseDate)"
+        
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd"
+        
+        guard let date = inputFormatter.date(from: releaseDate) else {
+            return "Release Date: \(releaseDate)"
+        }
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "d MMMM yyyy"
+        
+        let formattedDate = outputFormatter.string(from: date)
+        let components = formattedDate.components(separatedBy: " ")
+        
+        if let day = components.first, let dayInt = Int(day) {
+            let ordinalDay = dayInt.ordinalString()
+            let restOfDate = components.dropFirst().joined(separator: " ")
+            return "Release Date: \(ordinalDay) \(restOfDate)"
+        }
+        
+        return "Release Date: \(formattedDate)"
     }
 
     var formattedRunTime:String {
         guard let runtime else { return ""}
-        return runtime.formatAsHoursAndMinutes()
+        return "Duration: \(runtime.formatAsHoursAndMinutes())"
     }
 }
-
