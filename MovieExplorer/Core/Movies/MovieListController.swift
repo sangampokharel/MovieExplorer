@@ -29,7 +29,7 @@ class MovieListController: UIViewController {
         return activityIndicator
     }()
 
-    private let movieViewModel = MovieViewModel()
+    private let movieViewModel = MovieViewModel(movieService: MovieService())
     private var cancellables = Set<AnyCancellable>()
 
     override func viewDidLoad() {
@@ -98,7 +98,9 @@ extension MovieListController: UITableViewDataSource {
 
 extension MovieListController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigationController?.pushViewController(MovieDetailsController(), animated: true)
+        let movieDetailsVC = MovieDetailsController()
+        movieDetailsVC.movieId = self.movieViewModel.movies[indexPath.row].id
+        navigationController?.pushViewController(movieDetailsVC, animated: true)
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

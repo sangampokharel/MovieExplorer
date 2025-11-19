@@ -8,27 +8,46 @@
 import Foundation
 import Combine
 
+@MainActor
 class MovieViewModel: ObservableObject {
 
     @Published private(set) var movies: [MovieModel] = []
     @Published private(set) var isLoading: Bool?
     @Published private(set) var movie:MovieModel?
+    private var movieService:MovieServiceProtocol?
+
+    init(movieService:MovieServiceProtocol? = nil) {
+        self.movieService = movieService
+    }
 
     func fetchMovies() {
         isLoading = true
+
         Task {
-            try await Task.sleep(nanoseconds: 2_000_000_000)
-            movies = MovieModel.mocks
-            isLoading = false
+            do {
+                guard let moviesDTO = try await movieService?.fetchMovies() else { return }
+                self.movies = moviesDTO.map { MovieModel.init(movieDto: $0) }
+                isLoading = false
+            }catch {
+                isLoading = false
+                //TODO: Error Handling
+                print(error.localizedDescription)
+            }
         }
     }
 
-    func fetchMovieDetail(id:String) {
+    func fetchMovieDetail(id:Int) {
         isLoading = true
         Task {
-            try await Task.sleep(nanoseconds: 2_000_000_000)
-            movie = .mock
-            isLoading = false
+            do {
+                guard let movieDTO = try await movieService?.fetchMovieDetail(id: id) else { return }
+                self.movie = MovieModel.init(movieDto: movieDTO)
+                isLoading = false
+            }catch {
+                isLoading = false
+                //TODO: Error Handling
+                print(error.localizedDescription)
+            }
         }
     }
 }

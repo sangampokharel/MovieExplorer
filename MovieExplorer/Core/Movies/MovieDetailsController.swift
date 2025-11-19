@@ -62,14 +62,17 @@ class MovieDetailsController: UIViewController {
         return label
     }()
 
-    private let movieViewModel = MovieViewModel()
+    private let movieViewModel = MovieViewModel(movieService: MovieService())
     private var cancellables = Set<AnyCancellable>()
 
+    var movieId:Int?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUp()
-        movieViewModel.fetchMovieDetail(id: UUID().uuidString)
+        if let movieId {
+            movieViewModel.fetchMovieDetail(id: movieId)
+        }
         observe()
     }
 
@@ -123,9 +126,9 @@ class MovieDetailsController: UIViewController {
             imgView.topAnchor.constraint(equalTo: containerView.topAnchor),
             imgView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             imgView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            imgView.heightAnchor.constraint(equalToConstant: 200),
+            imgView.heightAnchor.constraint(equalToConstant: 400),
 
-            labelStackView.topAnchor.constraint(equalTo: imgView.bottomAnchor,constant: 4),
+            labelStackView.topAnchor.constraint(equalTo: imgView.bottomAnchor,constant: 16),
             labelStackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor,constant: 16),
             labelStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor,constant: -16),
             labelStackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
