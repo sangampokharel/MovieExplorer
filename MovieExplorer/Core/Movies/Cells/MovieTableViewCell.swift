@@ -14,32 +14,32 @@ class MovieTableViewCell: UITableViewCell {
     private lazy var labelsStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
 
     private lazy var titleLabel:UILabel = {
         let label = UILabel()
-        label.text = "This is title Label"
         label.font = .systemFont(ofSize: 20, weight: .bold)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
     private lazy var subTitleLabel:UILabel = {
         let label = UILabel()
-        label.text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. "
-        label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 18, weight: .light)
+        label.numberOfLines = 2
+        label.font = .systemFont(ofSize: 16, weight: .light)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
     private lazy var movieImageView:UIImageView = {
         let imgView = UIImageView()
-        imgView.image = UIImage(systemName: "photo.artframe")
+        imgView.backgroundColor = .systemGray5
+        imgView.contentMode = .scaleAspectFill
+        imgView.layer.cornerRadius = 16
+        imgView.clipsToBounds = true
         imgView.translatesAutoresizingMaskIntoConstraints = false
         return imgView
     }()
@@ -53,6 +53,11 @@ class MovieTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        movieImageView.cancelImageLoad()
+    }
+
     private func setUp() {
         selectionStyle = .none
         contentView.addSubview(movieImageView)
@@ -61,22 +66,24 @@ class MovieTableViewCell: UITableViewCell {
         labelsStackView.addArrangedSubview(subTitleLabel)
 
         NSLayoutConstraint.activate([
-            movieImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            movieImageView.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 8),
+            movieImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            movieImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 8),
             movieImageView.widthAnchor.constraint(equalToConstant: 150),
-            movieImageView.heightAnchor.constraint(equalToConstant: 100),
-            movieImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
 
             labelsStackView.leadingAnchor.constraint(equalTo: movieImageView.trailingAnchor,constant: 8),
-            labelsStackView.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 8),
-            labelsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -8),
+            labelsStackView.centerYAnchor.constraint(equalTo: movieImageView.centerYAnchor),
             labelsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -8)
         ])
     }
 
-
+    func config(image: String, title: String, subTitle: String) {
+        titleLabel.text = title
+        subTitleLabel.text = subTitle
+        movieImageView.loadImage(from: image)
+    }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
-
 }
