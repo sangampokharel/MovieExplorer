@@ -50,7 +50,7 @@ class MovieListController: UIViewController {
 
     private lazy var searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: resultsVC)
-        controller.searchResultsUpdater = self         
+        controller.searchResultsUpdater = self
         controller.obscuresBackgroundDuringPresentation = false
         controller.searchBar.placeholder = "Search"
         return controller
@@ -68,7 +68,7 @@ class MovieListController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setNavBar()
-        movieViewModel.fetchMovies()
+        movieViewModel.fetchMovies(filter: currentFilter?.key ?? "popularity.desc")
         observeChanges()
     }
 
@@ -80,7 +80,7 @@ class MovieListController: UIViewController {
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -178,7 +178,7 @@ extension MovieListController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let threshold = movieViewModel.movies.count - 3
         if indexPath.row >= max(threshold, 0) && !movieViewModel.isPaginating && movieViewModel.hasMorePages {
-            movieViewModel.fetchMovies()
+            movieViewModel.fetchMovies(filter: currentFilter?.key ?? Constants.popularKey)
         }
     }
 }

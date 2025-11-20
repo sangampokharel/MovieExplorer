@@ -17,13 +17,15 @@ class MovieViewModel: ObservableObject {
     private(set) var page = 0
     private(set) var hasMorePages = true
     private var movieService: MovieServiceProtocol?
+    private var currentFilter: String = "popularity.desc"
 
     init(movieService: MovieServiceProtocol? = nil) {
         self.movieService = movieService
     }
 
-    func fetchMovies(filter:String = Constants.popularKey) {
+    func fetchMovies(filter: String = "popularity.desc") {
         guard !isPaginating && !isLoading && hasMorePages else { return }
+        currentFilter = filter
         page += 1
         if page == 1 {
             isLoading = true
@@ -32,7 +34,7 @@ class MovieViewModel: ObservableObject {
         }
         Task {
             do {
-                guard let moviesDTO = try await movieService?.fetchMovies(page: page,filter:filter) else {
+                guard let moviesDTO = try await movieService?.fetchMovies(page: page, filter: filter) else {
                     resetLoadingStates()
                     return
                 }
