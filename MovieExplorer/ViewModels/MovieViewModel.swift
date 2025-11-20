@@ -10,7 +10,6 @@ import Combine
 
 @MainActor
 class MovieViewModel: ObservableObject {
-
     @Published private(set) var movies: [MovieModel] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var isPaginating: Bool = false
@@ -23,38 +22,31 @@ class MovieViewModel: ObservableObject {
         self.movieService = movieService
     }
 
-    func fetchMovies() {
-        // Prevent duplicate requests
+    func fetchMovies(filter:String = Constants.popularKey) {
         guard !isPaginating && !isLoading && hasMorePages else { return }
-        
         page += 1
-        
         if page == 1 {
             isLoading = true
         } else {
             isPaginating = true
         }
-        
         Task {
             do {
-                guard let moviesDTO = try await movieService?.fetchMovies(page: page) else { 
+                guard let moviesDTO = try await movieService?.fetchMovies(page: page,filter:filter) else {
                     resetLoadingStates()
-                    return 
+                    return
                 }
-                
                 let newMovies = moviesDTO.map { MovieModel(movieDto: $0) }
-                
                 if page == 1 {
                     self.movies = newMovies
                 } else {
                     self.movies.append(contentsOf: newMovies)
                 }
-                
-                // Check if we've reached the end (assuming empty response means no more pages)
+
                 if newMovies.isEmpty {
                     hasMorePages = false
                 }
-                
+
                 resetLoadingStates()
             } catch {
                 resetLoadingStates()
@@ -63,12 +55,12 @@ class MovieViewModel: ObservableObject {
             }
         }
     }
-    
+
     private func resetLoadingStates() {
         isLoading = false
         isPaginating = false
     }
-    
+
     func resetPagination() {
         page = 0
         hasMorePages = true

@@ -8,13 +8,13 @@
 import Foundation
 
 protocol MovieServiceProtocol {
-    func fetchMovies(page:Int) async throws -> [MovieDTO]
+    func fetchMovies(page:Int,filter:String) async throws -> [MovieDTO]
     func fetchMovieDetail(id:Int) async throws -> MovieDetailDTO
 }
 
 class MovieService: MovieServiceProtocol {
-    func fetchMovies(page:Int) async throws -> [MovieDTO] {
-        guard let url = URL(string: Urls.getMovieListUrl(page: page)) else {
+    func fetchMovies(page:Int,filter:String) async throws -> [MovieDTO] {
+        guard let url = URL(string: Urls.getMovieListUrl(page: page,filter:filter)) else {
             throw NetworkError.invalidUrl
         }
 
