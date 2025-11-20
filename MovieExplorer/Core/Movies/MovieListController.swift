@@ -182,7 +182,7 @@ extension MovieListController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let threshold = movieViewModel.movies.count - 3
-        if indexPath.row >= max(threshold, 0) && !movieViewModel.isPaginating && movieViewModel.hasMorePages && !movieViewModel.isOfflineMode {
+        if indexPath.row >= max(threshold, 0) && !movieViewModel.isPaginating && movieViewModel.hasMorePages {
             movieViewModel.fetchMovies(filter: currentFilter?.key ?? Constants.popularKey)
         }
     }
