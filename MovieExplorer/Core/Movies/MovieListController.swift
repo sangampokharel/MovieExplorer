@@ -45,7 +45,8 @@ class MovieListController: UIViewController {
 
     private let movieViewModel = MovieViewModel(movieService: MovieService())
     private var cancellables = Set<AnyCancellable>()
-    private var currentFilter: Filters?
+    
+    private var currentFilter: Filters? = Filters.data.first { $0.isSelected }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -95,7 +96,7 @@ class MovieListController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
                 guard let self else { return }
-
+                
                 if movieViewModel.page == 1 {
                     if isLoading == true {
                         self.activityIndicator.startAnimating()
@@ -109,7 +110,7 @@ class MovieListController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isPaginating in
                 guard let self else { return }
-
+                
                 if isPaginating == true {
                     self.footerSpinner.startAnimating()
                     self.tableView.tableFooterView = self.footerView
@@ -122,18 +123,18 @@ class MovieListController: UIViewController {
 
     @objc
     func onFilterPressed() {
-        let filterVC = FilterController()
+        let filterVC = FilterController(currentFilter: currentFilter)
         filterVC.onFilterSelected = { [weak self] selectedFilter in
             guard let self else { return }
-
+            
             if self.currentFilter?.key != selectedFilter.key {
                 self.currentFilter = selectedFilter
                 print("Filter changed to: \(selectedFilter.title) with key: \(selectedFilter.key)")
                 self.movieViewModel.resetPagination()
-                self.movieViewModel.fetchMovies(filter: currentFilter?.key ?? Constants.popularKey)
+                self.movieViewModel.fetchMovies(filter: selectedFilter.key)
             }
         }
-
+        
         if let sheet = filterVC.sheetPresentationController {
             sheet.detents = [UISheetPresentationController.Detent.custom(resolver: { context in
                 150
@@ -147,7 +148,7 @@ extension MovieListController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return movieViewModel.movies.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.identifier, for: indexPath) as! MovieTableViewCell
         let movie = movieViewModel.movies[indexPath.row]

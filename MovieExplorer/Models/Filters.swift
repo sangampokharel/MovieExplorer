@@ -7,29 +7,27 @@
 import Foundation
 
 struct Filters {
-    let title:String
-    let isSelected:Bool
-    let key:String
-    static var data:[Self] {
+    let title: String
+    let isSelected: Bool
+    let key: String
+    
+    static var data: [Self] {
         [
             Self(
                 title: "Popular",
                 isSelected: true,
-                key: Constants.popularKey
+                key: "popularity.desc"
             ),
-
             Self(
                 title: "Revenue",
                 isSelected: false,
-                key: Constants.revenueKey
+                key: "revenue.desc"
             ),
-
             Self(
                 title: "Voted",
                 isSelected: false,
-                key: Constants.votedKey
+                key: "vote_count.desc"
             ),
         ]
     }
-
 }

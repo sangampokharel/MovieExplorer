@@ -26,13 +26,35 @@ class FilterController: UIViewController {
         return label
     }()
 
-    private var filters: [Filters] = Filters.data
+    private var filters: [Filters] = []
 
     private var radioButtons: [RadioButton] = []
 
-    var selectedFilter: Filters?
+    private(set) var selectedFilter: Filters?
     
+    // Add completion closure property
     var onFilterSelected: ((Filters) -> Void)?
+    
+    // Add initializer to accept current filter
+    init(currentFilter: Filters? = nil) {
+        super.init(nibName: nil, bundle: nil)
+        setupFilters(with: currentFilter)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupFilters(with currentFilter: Filters?) {
+        filters = Filters.data.map { filter in
+            // Mark the filter as selected if it matches the current filter
+            let isSelected = currentFilter?.key == filter.key
+            return Filters(title: filter.title, isSelected: isSelected, key: filter.key)
+        }
+        
+        // Set the selected filter
+        selectedFilter = filters.first { $0.isSelected } ?? filters.first
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +64,7 @@ class FilterController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
+        // Call the completion closure when the view controller is being dismissed
         if let selectedFilter = selectedFilter {
             onFilterSelected?(selectedFilter)
         }
@@ -66,10 +89,6 @@ class FilterController: UIViewController {
             radioBtn.addTarget(self, action: #selector(radioButtonTapped(_:)), for: .touchUpInside)
 
             radioButtons.append(radioBtn)
-
-            if item.isSelected {
-                selectedFilter = item
-            }
 
             let stackView = UIStackView()
             stackView.axis = .horizontal
