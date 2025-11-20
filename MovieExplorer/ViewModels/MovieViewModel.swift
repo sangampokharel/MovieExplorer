@@ -17,30 +17,43 @@ class MovieViewModel: ObservableObject {
     private(set) var page = 0
     private(set) var hasMorePages = true
     private var movieService: MovieServiceProtocol?
+    private let offlineMovieService = OfflineMovieService()
     private var currentFilter: String = "popularity.desc"
 
     init(movieService: MovieServiceProtocol? = nil) {
         self.movieService = movieService
+        loadCachedMoviesOnLaunch()
     }
 
     func fetchMovies(filter: String = "popularity.desc") {
-        guard !isPaginating && !isLoading && hasMorePages else { return }
         currentFilter = filter
+
+        Task {
+            await loadCachedMovies()
+        }
+
+        guard !isPaginating && !isLoading && hasMorePages else { return }
+
         page += 1
         if page == 1 {
             isLoading = true
         } else {
             isPaginating = true
         }
+
         Task {
             do {
                 guard let moviesDTO = try await movieService?.fetchMovies(page: page, filter: filter) else {
                     resetLoadingStates()
+                    await loadCachedMovies()
                     return
                 }
+
                 let newMovies = moviesDTO.map { MovieModel(movieDto: $0) }
+
                 if page == 1 {
                     self.movies = newMovies
+                    await offlineMovieService.cacheMovies(newMovies)
                 } else {
                     self.movies.append(contentsOf: newMovies)
                 }
@@ -52,10 +65,35 @@ class MovieViewModel: ObservableObject {
                 resetLoadingStates()
             } catch {
                 resetLoadingStates()
-                // TODO: Better error handling - show alert or error state
+                await loadCachedMovies()
                 print("Error fetching movies: \(error.localizedDescription)")
             }
         }
+    }
+
+    private func loadCachedMoviesOnLaunch() {
+        Task {
+            await loadCachedMovies()
+        }
+    }
+
+    private func loadCachedMovies() async {
+        let cachedMovies = await offlineMovieService.getCachedMovies(filter: currentFilter)
+        if !cachedMovies.isEmpty {
+            await MainActor.run {
+                if self.page == 0 || self.movies.isEmpty {
+                    self.movies = cachedMovies
+                }
+            }
+        }
+    }
+
+    func refreshMovies(filter: String = "popularity.desc") {
+        resetPagination()
+        Task {
+            await offlineMovieService.clearCache()
+        }
+        fetchMovies(filter: filter)
     }
 
     private func resetLoadingStates() {

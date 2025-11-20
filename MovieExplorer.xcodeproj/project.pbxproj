@@ -8,7 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		006AACD52ECD92B200D079D1 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 006AACD42ECD92B200D079D1 /* SDWebImage */; };
+		00AA31AE2ECF373A007D139D /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 00AA31AD2ECF373A007D139D /* RealmSwift */; };
+		00AA31B92ECF3B99007D139D /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 00AA31AD2ECF373A007D139D /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		00AA31B82ECF3B98007D139D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				00AA31B92ECF3B99007D139D /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		006D5DF72ECC879B002BCCD3 /* MovieExplorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieExplorer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -40,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00AA31AE2ECF373A007D139D /* RealmSwift in Frameworks */,
 				006AACD52ECD92B200D079D1 /* SDWebImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -74,6 +91,7 @@
 				006D5DF42ECC879B002BCCD3 /* Frameworks */,
 				006D5DF52ECC879B002BCCD3 /* Resources */,
 				006D5E712ECC8868002BCCD3 /* ShellScript */,
+				00AA31B82ECF3B98007D139D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -85,6 +103,7 @@
 			name = MovieExplorer;
 			packageProductDependencies = (
 				006AACD42ECD92B200D079D1 /* SDWebImage */,
+				00AA31AD2ECF373A007D139D /* RealmSwift */,
 			);
 			productName = MovieExplorer;
 			productReference = 006D5DF72ECC879B002BCCD3 /* MovieExplorer.app */;
@@ -116,6 +135,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				006AACD32ECD92B200D079D1 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				00AA31AA2ECF373A007D139D /* XCRemoteSwiftPackageReference "realm-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 006D5DF82ECC879B002BCCD3 /* Products */;
@@ -394,6 +414,14 @@
 				minimumVersion = 5.21.3;
 			};
 		};
+		00AA31AA2ECF373A007D139D /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -401,6 +429,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 006AACD32ECD92B200D079D1 /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImage;
+		};
+		00AA31AD2ECF373A007D139D /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 00AA31AA2ECF373A007D139D /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

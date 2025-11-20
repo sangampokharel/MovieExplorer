@@ -56,6 +56,7 @@ class MovieListController: UIViewController {
         return controller
     }()
 
+
     //MARK: Data Properties
     private let movieViewModel = MovieViewModel(movieService: MovieService())
     private let searchViewModel = SearchViewModel.shared
@@ -77,15 +78,19 @@ class MovieListController: UIViewController {
         view.backgroundColor = .systemBackground
         view.addSubview(tableView)
         view.addSubview(activityIndicator)
+
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+
         tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.identifier)
+
     }
 
     private func setNavBar() {
@@ -97,7 +102,6 @@ class MovieListController: UIViewController {
             target: self,
             action: #selector(onFilterPressed)
         )
-
 
         navigationItem.searchController = searchController
         definesPresentationContext = true
@@ -139,6 +143,7 @@ class MovieListController: UIViewController {
                     self.tableView.tableFooterView = nil
                 }
             }.store(in: &cancellables)
+
     }
 
     @objc
@@ -177,7 +182,7 @@ extension MovieListController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let threshold = movieViewModel.movies.count - 3
-        if indexPath.row >= max(threshold, 0) && !movieViewModel.isPaginating && movieViewModel.hasMorePages {
+        if indexPath.row >= max(threshold, 0) && !movieViewModel.isPaginating && movieViewModel.hasMorePages && !movieViewModel.isOfflineMode {
             movieViewModel.fetchMovies(filter: currentFilter?.key ?? Constants.popularKey)
         }
     }
