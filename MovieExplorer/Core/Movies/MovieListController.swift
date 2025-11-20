@@ -44,10 +44,24 @@ class MovieListController: UIViewController {
         return view
     }()
 
+    private lazy var resultsVC: UINavigationController = {
+        return UINavigationController(rootViewController: SearchController())
+    }()
+
+    private lazy var searchController: UISearchController = {
+        let controller = UISearchController(searchResultsController: resultsVC)
+        controller.searchResultsUpdater = self         
+        controller.obscuresBackgroundDuringPresentation = false
+        controller.searchBar.placeholder = "Search"
+        return controller
+    }()
+
     //MARK: Data Properties
     private let movieViewModel = MovieViewModel(movieService: MovieService())
+    private let searchViewModel = SearchViewModel.shared
     private var cancellables = Set<AnyCancellable>()
     private var currentFilter: FiltersModel? = FiltersModel.data.first { $0.isSelected }
+    private var debounceTimer: Timer?
 
     //MARK: LifeCycle
     override func viewDidLoad() {
@@ -83,7 +97,10 @@ class MovieListController: UIViewController {
             target: self,
             action: #selector(onFilterPressed)
         )
-        navigationController?.navigationBar.topItem?.searchController = UISearchController(searchResultsController: SearchController())
+
+
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
     }
 
     private func observeChanges() {
@@ -175,5 +192,17 @@ extension MovieListController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
+    }
+}
+
+extension MovieListController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let query = searchController.searchBar.text ?? ""
+        debounceTimer?.invalidate()
+        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false) { [weak self] _ in
+            Task {
+                await self?.searchViewModel.search(query: query)
+            }
+        }
     }
 }

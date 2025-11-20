@@ -10,15 +10,22 @@ import Combine
 
 class SearchController: UIViewController {
 
-    private lazy var tableView:UITableView = {
+    private let searchViewModel = SearchViewModel.shared
+    private var cancellables = Set<AnyCancellable>()
+    private var moviesSearchList: [MovieModel] = []
+    private var isLoading: Bool = false
+
+    private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.separatorStyle = .none
+        tableView.separatorInset = .zero
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
 
-    private lazy var indicator: UIActivityIndicatorView = {
+    private lazy var activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.style = .large
         activityIndicator.hidesWhenStopped = true
@@ -26,72 +33,86 @@ class SearchController: UIViewController {
         return activityIndicator
     }()
 
-    private let searchViewModel = SearchViewModel(service: SearchService())
-    private var cancellables = Set<AnyCancellable>()
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUp()
-        searchViewModel.search(query: "Frank")
+        setupUI()
+        observeViewModel()
     }
 
-    private func setUp() {
+    private func setupUI() {
         view.backgroundColor = .systemBackground
         view.addSubview(tableView)
-        view.addSubview(indicator)
+        view.addSubview(activityIndicator)
+
         NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-
-            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+
+        tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.identifier)
     }
 
-    private func observe() {
-        searchViewModel.$isLoading
+    private func observeViewModel() {
+        searchViewModel.$moviesSearchList
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
-                guard let self else { return }
-                if let value {
-                    if value {
-                        self.indicator.startAnimating()
-                    }else{
-                        self.indicator.stopAnimating()
-                    }
-                }
-            }.store(in: &cancellables)
-
-        searchViewModel.$moviesSearchList.receive(on: DispatchQueue.main)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
-                guard let self else {return}
+            .sink { [weak self] movies in
+                guard let self = self else { return }
+                self.moviesSearchList = movies
                 self.tableView.reloadData()
-            }.store(in: &cancellables)
+            }
+            .store(in: &cancellables)
+
+        searchViewModel.$isLoading
+            .compactMap { $0 } // Unwrap optional
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                guard let self = self else { return }
+                self.isLoading = isLoading
+                if isLoading {
+                    self.activityIndicator.startAnimating()
+                } else {
+                    self.activityIndicator.stopAnimating()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    func searchMovies(query: String) {
+        searchViewModel.search(query: query)
+    }
+
+    func clearSearchResults() {
+        searchViewModel.clearResults()
     }
 }
 
 extension SearchController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return searchViewModel.moviesSearchList.count
+        return moviesSearchList.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        let name = searchViewModel.moviesSearchList[indexPath.row].movieName
-        let overview = searchViewModel.moviesSearchList[indexPath.row].movieDescription
-        cell.textLabel?.text = name
-        cell.detailTextLabel?.text = overview
+        let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.identifier, for: indexPath) as! MovieTableViewCell
+        let movie = moviesSearchList[indexPath.row]
+        cell.config(image: movie.imageUrl, title: movie.movieName, subTitle: movie.movieDescription)
         return cell
     }
 }
 
 extension SearchController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         let movieDetailsVC = MovieDetailsController()
-        movieDetailsVC.movieId = searchViewModel.moviesSearchList[indexPath.row].id
-        navigationController?.pushViewController(movieDetailsVC, animated: true)
+        movieDetailsVC.movieId = moviesSearchList[indexPath.row].id
+        if let navigationController = self.navigationController {
+            navigationController.pushViewController(movieDetailsVC, animated: true)
+        }
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
     }
 }

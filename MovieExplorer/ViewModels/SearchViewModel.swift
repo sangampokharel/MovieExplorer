@@ -8,27 +8,37 @@
 import Foundation
 import Combine
 
+@MainActor
 class SearchViewModel: ObservableObject {
+    static let shared = SearchViewModel()
+    @Published private(set) var moviesSearchList: [MovieModel] = []
+    @Published private(set) var isLoading: Bool = false
+    private let service = SearchService()
+    
+    private init() {}
 
-    @Published private(set) var moviesSearchList:[MovieModel] = []
-    @Published private(set) var isLoading:Bool?
-    private var service:SearchServiceProtocol!
-
-    init(service:SearchServiceProtocol) {
-        self.service = service
-    }
-
-    func search(query:String) {
+    func search(query: String) {
+        guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            clearResults()
+            return
+        }
+        
         isLoading = true
         Task {
-            do{
-               let searchResultsDtos = try await service.fetchSearchResults(query: query)
-                self.moviesSearchList.append(contentsOf: searchResultsDtos.map { MovieModel(movieDto: $0)} )
+            do {
+                let searchResultsDtos = try await service.fetchSearchResults(query: query)
+                let mappedMovies = searchResultsDtos.map { MovieModel(movieDto: $0) }
+                self.moviesSearchList = mappedMovies
                 isLoading = false
-            }catch {
+            } catch {
                 isLoading = false
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    func clearResults() {
+        moviesSearchList.removeAll()
+        isLoading = false
     }
 }
