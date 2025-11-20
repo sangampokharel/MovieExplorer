@@ -10,6 +10,7 @@ import Combine
 
 class MovieListController: UIViewController {
 
+    //MARK: UI Properties
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.dataSource = self
@@ -43,11 +44,12 @@ class MovieListController: UIViewController {
         return view
     }()
 
+    //MARK: Data Properties
     private let movieViewModel = MovieViewModel(movieService: MovieService())
     private var cancellables = Set<AnyCancellable>()
-    
-    private var currentFilter: Filters? = Filters.data.first { $0.isSelected }
+    private var currentFilter: FiltersModel? = FiltersModel.data.first { $0.isSelected }
 
+    //MARK: LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -56,11 +58,11 @@ class MovieListController: UIViewController {
         observeChanges()
     }
 
+    //MARK: Functions
     private func setupUI() {
         view.backgroundColor = .systemBackground
         view.addSubview(tableView)
         view.addSubview(activityIndicator)
-
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -81,6 +83,7 @@ class MovieListController: UIViewController {
             target: self,
             action: #selector(onFilterPressed)
         )
+        navigationController?.navigationBar.topItem?.searchController = UISearchController(searchResultsController: SearchController())
     }
 
     private func observeChanges() {
@@ -96,7 +99,7 @@ class MovieListController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
                 guard let self else { return }
-                
+
                 if movieViewModel.page == 1 {
                     if isLoading == true {
                         self.activityIndicator.startAnimating()
@@ -110,7 +113,7 @@ class MovieListController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isPaginating in
                 guard let self else { return }
-                
+
                 if isPaginating == true {
                     self.footerSpinner.startAnimating()
                     self.tableView.tableFooterView = self.footerView
@@ -126,15 +129,13 @@ class MovieListController: UIViewController {
         let filterVC = FilterController(currentFilter: currentFilter)
         filterVC.onFilterSelected = { [weak self] selectedFilter in
             guard let self else { return }
-            
             if self.currentFilter?.key != selectedFilter.key {
                 self.currentFilter = selectedFilter
-                print("Filter changed to: \(selectedFilter.title) with key: \(selectedFilter.key)")
                 self.movieViewModel.resetPagination()
                 self.movieViewModel.fetchMovies(filter: selectedFilter.key)
             }
         }
-        
+
         if let sheet = filterVC.sheetPresentationController {
             sheet.detents = [UISheetPresentationController.Detent.custom(resolver: { context in
                 150
@@ -144,6 +145,7 @@ class MovieListController: UIViewController {
     }
 }
 
+//MARK: Extensions
 extension MovieListController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return movieViewModel.movies.count

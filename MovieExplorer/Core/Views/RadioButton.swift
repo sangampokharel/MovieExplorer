@@ -53,7 +53,3 @@ class RadioButton: UIButton {
         }
     }
 }
-
-#Preview {
-    RadioButton()
-}

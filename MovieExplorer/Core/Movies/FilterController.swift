@@ -26,17 +26,17 @@ class FilterController: UIViewController {
         return label
     }()
 
-    private var filters: [Filters] = []
+    private var filters: [FiltersModel] = []
 
     private var radioButtons: [RadioButton] = []
 
-    private(set) var selectedFilter: Filters?
+    private(set) var selectedFilter: FiltersModel?
     
     // Add completion closure property
-    var onFilterSelected: ((Filters) -> Void)?
+    var onFilterSelected: ((FiltersModel) -> Void)?
     
     // Add initializer to accept current filter
-    init(currentFilter: Filters? = nil) {
+    init(currentFilter: FiltersModel? = nil) {
         super.init(nibName: nil, bundle: nil)
         setupFilters(with: currentFilter)
     }
@@ -45,11 +45,11 @@ class FilterController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupFilters(with currentFilter: Filters?) {
-        filters = Filters.data.map { filter in
+    private func setupFilters(with currentFilter: FiltersModel?) {
+        filters = FiltersModel.data.map { filter in
             // Mark the filter as selected if it matches the current filter
             let isSelected = currentFilter?.key == filter.key
-            return Filters(title: filter.title, isSelected: isSelected, key: filter.key)
+            return FiltersModel(title: filter.title, isSelected: isSelected, key: filter.key)
         }
         
         // Set the selected filter
@@ -118,7 +118,7 @@ class FilterController: UIViewController {
         print("Selected filter: \(selectedFilter?.title ?? ""), key: \(selectedFilter?.key ?? "")")
     }
 
-    func getCurrentFilter() -> Filters? {
+    func getCurrentFilter() -> FiltersModel? {
         return selectedFilter
     }
 }

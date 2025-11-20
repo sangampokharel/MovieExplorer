@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct Filters {
+struct FiltersModel {
     let title: String
     let isSelected: Bool
     let key: String

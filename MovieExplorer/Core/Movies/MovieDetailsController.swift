@@ -10,6 +10,7 @@ import Combine
 
 class MovieDetailsController: UIViewController {
 
+    //MARK: UI Properties
     private lazy var scrollView:UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -39,7 +40,6 @@ class MovieDetailsController: UIViewController {
         return stackView
     }()
 
-
     private lazy var activityIndicator:UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.style = .large
@@ -47,7 +47,6 @@ class MovieDetailsController: UIViewController {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         return activityIndicator
     }()
-
 
     private lazy var titleLabel:UILabel = {
         let label = UILabel()
@@ -91,6 +90,7 @@ class MovieDetailsController: UIViewController {
         return label
     }()
 
+    //MARK: Data Properties
     private let movieViewModel = MovieViewModel(movieService: MovieService())
     private var cancellables = Set<AnyCancellable>()
 
