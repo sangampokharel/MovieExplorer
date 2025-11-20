@@ -116,7 +116,7 @@ class MovieDetailsController: UIViewController {
 
         movieViewModel.$isLoading
             .receive(on: DispatchQueue.main).sink { [weak self] value in
-                guard let self, let value else {return}
+                guard let self else {return}
                 if value {
                     self.activityIndicator.startAnimating()
                 }else{

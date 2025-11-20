@@ -20,13 +20,27 @@ class MovieListController: UIViewController {
         return tableView
     }()
 
-
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.style = .large
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         return activityIndicator
+    }()
+
+    private lazy var footerSpinner: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .medium
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        return activityIndicator
+    }()
+
+    private lazy var footerView: UIView = {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50))
+        view.addSubview(footerSpinner)
+        footerSpinner.center = view.center
+        return view
     }()
 
     private let movieViewModel = MovieViewModel(movieService: MovieService())
@@ -65,20 +79,37 @@ class MovieListController: UIViewController {
         movieViewModel
             .$movies
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] movies in
-                guard let self else {return}
+            .sink { [weak self] _ in
+                guard let self else { return }
                 self.tableView.reloadData()
             }.store(in: &cancellables)
 
         movieViewModel.$isLoading
-            .receive(on: DispatchQueue.main).sink { [weak self] value in
-                guard let self, let value else {return}
-                if value {
-                    self.activityIndicator.startAnimating()
-                }else{
-                    self.activityIndicator.stopAnimating()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                guard let self else { return }
+                
+                if movieViewModel.page == 1 {
+                    if isLoading == true {
+                        self.activityIndicator.startAnimating()
+                    } else {
+                        self.activityIndicator.stopAnimating()
+                    }
                 }
+            }.store(in: &cancellables)
 
+        movieViewModel.$isPaginating
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isPaginating in
+                guard let self else { return }
+                
+                if isPaginating == true {
+                    self.footerSpinner.startAnimating()
+                    self.tableView.tableFooterView = self.footerView
+                } else {
+                    self.footerSpinner.stopAnimating()
+                    self.tableView.tableFooterView = nil
+                }
             }.store(in: &cancellables)
     }
 }
@@ -94,6 +125,13 @@ extension MovieListController: UITableViewDataSource {
         cell.config(image: movie.imageUrl, title: movie.movieName, subTitle: movie.movieDescription)
         return cell
     }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let threshold = movieViewModel.movies.count - 3
+        if indexPath.row >= max(threshold, 0) && !movieViewModel.isPaginating && movieViewModel.hasMorePages {
+            movieViewModel.fetchMovies()
+        }
+    }
 }
 
 extension MovieListController: UITableViewDelegate {
@@ -106,5 +144,4 @@ extension MovieListController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
-
 }

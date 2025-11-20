@@ -12,40 +12,79 @@ import Combine
 class MovieViewModel: ObservableObject {
 
     @Published private(set) var movies: [MovieModel] = []
-    @Published private(set) var isLoading: Bool?
-    @Published private(set) var movie:MovieDetailModel?
-    private var movieService:MovieServiceProtocol?
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var isPaginating: Bool = false
+    @Published private(set) var movie: MovieDetailModel?
+    private(set) var page = 0
+    private(set) var hasMorePages = true
+    private var movieService: MovieServiceProtocol?
 
-    init(movieService:MovieServiceProtocol? = nil) {
+    init(movieService: MovieServiceProtocol? = nil) {
         self.movieService = movieService
     }
 
     func fetchMovies() {
-        isLoading = true
-
+        // Prevent duplicate requests
+        guard !isPaginating && !isLoading && hasMorePages else { return }
+        
+        page += 1
+        
+        if page == 1 {
+            isLoading = true
+        } else {
+            isPaginating = true
+        }
+        
         Task {
             do {
-                guard let moviesDTO = try await movieService?.fetchMovies() else { return }
-                self.movies = moviesDTO.map { MovieModel.init(movieDto: $0) }
-                isLoading = false
-            }catch {
-                isLoading = false
-                //TODO: Error Handling
-                print(error.localizedDescription)
+                guard let moviesDTO = try await movieService?.fetchMovies(page: page) else { 
+                    resetLoadingStates()
+                    return 
+                }
+                
+                let newMovies = moviesDTO.map { MovieModel(movieDto: $0) }
+                
+                if page == 1 {
+                    self.movies = newMovies
+                } else {
+                    self.movies.append(contentsOf: newMovies)
+                }
+                
+                // Check if we've reached the end (assuming empty response means no more pages)
+                if newMovies.isEmpty {
+                    hasMorePages = false
+                }
+                
+                resetLoadingStates()
+            } catch {
+                resetLoadingStates()
+                // TODO: Better error handling - show alert or error state
+                print("Error fetching movies: \(error.localizedDescription)")
             }
         }
     }
+    
+    private func resetLoadingStates() {
+        isLoading = false
+        isPaginating = false
+    }
+    
+    func resetPagination() {
+        page = 0
+        hasMorePages = true
+        movies.removeAll()
+    }
 
-    func fetchMovieDetail(id:Int) {
+    func fetchMovieDetail(id: Int) {
         isLoading = true
         Task {
             do {
                 guard let movieDetailDTO = try await movieService?.fetchMovieDetail(id: id) else { return }
-                self.movie = MovieDetailModel.init(movieDetailDTO: movieDetailDTO)
+                self.movie = MovieDetailModel(movieDetailDTO: movieDetailDTO)
                 isLoading = false
-            }catch {
+            } catch {
                 isLoading = false
-                //TODO: Error Handling
+                // TODO: Error Handling
                 print(error.localizedDescription)
             }
         }
