@@ -1,5 +1,21 @@
-## Architecture
+## ScreenShots
+<!-- Row 1 -->
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/5ebc8d12-ae3f-4fa6-91ac-f02ee7bad280" width="24%" />
+  <img src="https://github.com/user-attachments/assets/2a15c1d1-500e-4331-ad6f-d09c43fba337" width="24%" />
+  <img src="https://github.com/user-attachments/assets/4acadd77-d515-45a3-8e68-dca8f3810c0e" width="24%" />
+  <img src="https://github.com/user-attachments/assets/73d949aa-ba4e-41ed-af82-435591f4dfb8" width="24%" />
+</p>
 
+<!-- Row 2 -->
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/abc01e88-02ea-4df8-a4c9-e8aba3a3a9c7" width="24%" />
+  <img src="https://github.com/user-attachments/assets/02274cbe-cd15-4e5b-b023-c0fb4d7f3011" width="24%" />
+  <img src="https://github.com/user-attachments/assets/92a79883-b26f-413c-b2fa-d1af62fc2e8e" width="24%" />
+  <img src="https://github.com/user-attachments/assets/6d96a2de-dbb0-45ee-bc25-a8ba5a48b0f9" width="24%" />
+</p>
+
+## Architecture
 The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) design:
 
 ## Configuration
