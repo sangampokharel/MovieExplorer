@@ -16,11 +16,11 @@ The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) de
 ## Features in Detail
 
 # 📱 User Interface
-• Movie List: Displays movies in a clean table view with poster images
-• Search: Real-time search with debounced input
-• Filtering: Bottom sheet with radio button selection for sorting
-• Loading States: Activity indicators for initial load and pagination
-• Error Handling: User-friendly alerts with retry options
+- Movie List: Displays movies in a clean table view with poster images
+- Search: Real-time search with debounced input
+- Filtering: Bottom sheet with radio button selection for sorting
+- Loading States: Activity indicators for initial load and pagination
+- Error Handling: User-friendly alerts with retry options
 
 🌐 Network Layer
 • API Integration: TMDB API endpoints for popular, revenue, and top voted movies
@@ -28,9 +28,9 @@ The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) de
 • Network Monitoring: Detects connectivity changes and switches to offline mode
 
 💾 Offline Support
-• Automatic Caching: Movies are cached locally for offline viewing
-• Offline Mode: Seamless switching between online and offline content
-• Background Caching: Efficient async operations for data persistence
+- Automatic Caching: Movies are cached locally for offline viewing
+- Offline Mode: Seamless switching between online and offline content
+- Background Caching: Efficient async operations for data persistence
 
 ## Project Structure Usage
 
@@ -44,22 +44,22 @@ The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) de
 ## API Endpoints
 
 The app uses the following TMDB API filter keys:
-• popularity.desc - Sort by popularity (descending)
-• revenue.desc - Sort by revenue (descending)
-• vote_count.desc - Sort by vote count (descending)
+- popularity.desc - Sort by popularity (descending)
+- revenue.desc - Sort by revenue (descending)
+- vote_count.desc - Sort by vote count (descending)
 
 # Persistence Layer
 
 Using Realm Swift for local storage:
-• Async Operations: All database operations are async/await based
-• Category-based Caching: Movies are categorized by filter type
-• Efficient Queries: Optimized Realm queries for fast retrieval
-• Automatic Updates: update: .all policy for seamless data updates
+- Async Operations: All database operations are async/await based
+- Category-based Caching: Movies are categorized by filter type
+- Efficient Queries: Optimized Realm queries for fast retrieval
+- Automatic Updates: update: .all policy for seamless data updates
 
 
 Created by Sangam Pokharel (November 2025)
 
 Acknowledgments
-• The Movie Database (TMDB) for providing movie data
-• Realm for the persistence layer
-• Apple's Combine framework for reactive programming
+- The Movie Database (TMDB) for providing movie data
+- Realm for the persistence layer
+- Apple's Combine framework for reactive programming
