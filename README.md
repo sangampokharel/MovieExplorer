@@ -2,6 +2,10 @@
 
 The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) design:
 
+## Configuration
+- XCode26.1.1
+- Swift 6.2
+
 ## Core Components
 
 - MovieModel: The main data model representing a movie
