@@ -205,7 +205,7 @@ class MovieListController: UIViewController {
 
         if let sheet = filterVC.sheetPresentationController {
             sheet.detents = [UISheetPresentationController.Detent.custom(resolver: { context in
-                150
+                155
             })]
         }
         self.present(filterVC, animated: true)

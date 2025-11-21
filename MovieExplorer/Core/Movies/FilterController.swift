@@ -96,12 +96,12 @@ class FilterController: UIViewController {
         }
 
         NSLayoutConstraint.activate([
-            filterLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,constant: 8),
-            filterLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 8),
+            filterLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,constant: 16),
+            filterLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
+            filterLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             rootStackView.topAnchor.constraint(equalTo: filterLabel.bottomAnchor,constant: 8),
-            rootStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 8),
-            rootStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -8),
-            rootStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            rootStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
+            rootStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -16),
         ])
     }
 
