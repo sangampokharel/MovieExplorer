@@ -2,7 +2,7 @@
 //  RealmMovieObject.swift
 //  MovieExplorer
 //
-//  Created on 25/11/2025.
+//  Created by Ekbana 25/11/2025.
 //
 
 import RealmSwift
@@ -18,9 +18,7 @@ class RealmMovieObject: Object {
     @Persisted var category: String
     @Persisted var savedAt: Date
 
-    nonisolated override init() {
-        
-    }
+    nonisolated override init() {}
 
     @MainActor
     func configure(from movieModel: MovieModel, filter: String) {

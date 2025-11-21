@@ -18,14 +18,14 @@ class MovieViewModel: ObservableObject {
     private(set) var hasMorePages = true
     private var movieService: MovieServiceProtocol?
     private let offlineMovieService = OfflineMovieService()
-    private var currentFilter: String = "popularity.desc"
+    private var currentFilter: String = Constants.popularKey
 
     init(movieService: MovieServiceProtocol? = nil) {
         self.movieService = movieService
         loadCachedMoviesOnLaunch()
     }
 
-    func fetchMovies(filter: String = "popularity.desc") {
+    func fetchMovies(filter: String = Constants.popularKey) {
         currentFilter = filter
 
         Task {
@@ -88,7 +88,7 @@ class MovieViewModel: ObservableObject {
         }
     }
 
-    func refreshMovies(filter: String = "popularity.desc") {
+    func refreshMovies(filter: String = Constants.popularKey) {
         resetPagination()
         Task {
             await offlineMovieService.clearCache()

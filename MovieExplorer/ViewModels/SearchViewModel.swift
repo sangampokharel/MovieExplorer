@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 
-@MainActor
 class SearchViewModel: ObservableObject {
     static let shared = SearchViewModel()
     @Published private(set) var moviesSearchList: [MovieModel] = []
