@@ -15,6 +15,9 @@
   <img src="https://github.com/user-attachments/assets/6d96a2de-dbb0-45ee-bc25-a8ba5a48b0f9" width="24%" />
 </p>
 
+# Video URL
+- https://cloud.ekbana.info/index.php/s/8XMb0kKkGavCaRP
+
 ## Architecture
 The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) design:
 
