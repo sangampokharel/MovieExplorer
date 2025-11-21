@@ -4,13 +4,13 @@ The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) de
 
 ## Core Components
 
-• MovieModel: The main data model representing a movie
-• MovieDTO: Data Transfer Object for API responses from TMDB
-• MovieViewModel: Handles business logic and state management
-• OfflineMovieService: Handles offline caching and persistence operations
-• RealmMovieRepository: Manages local database operations using Realm
-• FilterController: UI component for movie category filtering
-• RadioButton: Custom UI component for filter selection
+- MovieModel: The main data model representing a movie
+- MovieDTO: Data Transfer Object for API responses from TMDB
+- MovieViewModel: Handles business logic and state management
+- OfflineMovieService: Handles offline caching and persistence operations
+- RealmMovieRepository: Manages local database operations using Realm
+- FilterController: UI component for movie category filtering
+- RadioButton: Custom UI component for filter selection
 
 
 ## Features in Detail
