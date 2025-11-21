@@ -16,16 +16,16 @@ class OfflineMovieService {
     
     func cacheMovies(_ movies: [MovieModel]) async {
         do {
+            await clearMovies()
             try await persistenceRepository.saveMovies(movies)
-            print("Successfully cached \(movies.count) movies")
         } catch {
             print("Failed to cache movies: \(error.localizedDescription)")
         }
     }
     
-    func getCachedMovies(filter: String = "default") async -> [MovieModel] {
+    func getCachedMovies() async -> [MovieModel] {
         do {
-            return try await persistenceRepository.fetchMovies(filter: filter)
+            return try await persistenceRepository.fetchMovies()
         } catch {
             print("Failed to fetch cached movies: \(error.localizedDescription)")
             return []
@@ -37,6 +37,14 @@ class OfflineMovieService {
             try await persistenceRepository.clearMovies()
         } catch {
             print("Failed to clear cache: \(error.localizedDescription)")
+        }
+    }
+    
+     func clearMovies() async {
+        do {
+            try await persistenceRepository.clearMovies()
+        } catch {
+            print("Failed to clear movies : \(error.localizedDescription)")
         }
     }
 }

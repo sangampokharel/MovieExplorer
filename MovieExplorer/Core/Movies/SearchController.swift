@@ -14,6 +14,7 @@ class SearchController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var moviesSearchList: [MovieModel] = []
     private var isLoading: Bool = false
+    private var currentQuery: String = ""
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -79,9 +80,23 @@ class SearchController: UIViewController {
                 }
             }
             .store(in: &cancellables)
+        
+        searchViewModel.$error
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                guard let self = self else { return }
+                if self.moviesSearchList.isEmpty {
+                    self.showError(error) { [weak self] in
+                        self?.searchViewModel.retryLastSearch(query: self?.currentQuery ?? "")
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
 
     func searchMovies(query: String) {
+        currentQuery = query
         searchViewModel.search(query: query)
     }
 

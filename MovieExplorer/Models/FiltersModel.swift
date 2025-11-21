@@ -16,17 +16,17 @@ struct FiltersModel {
             Self(
                 title: "Popular",
                 isSelected: true,
-                key: "popularity.desc"
+                key: Constants.popularKey
             ),
             Self(
                 title: "Revenue",
                 isSelected: false,
-                key: "revenue.desc"
+                key: Constants.revenueKey
             ),
             Self(
                 title: "Voted",
                 isSelected: false,
-                key: "vote_count.desc"
+                key: Constants.votedKey
             ),
         ]
     }

@@ -10,7 +10,7 @@ import RealmSwift
 
 class RealmMovieRepository: MoviePersistenceProtocol {
     private let realm: Realm
-    
+
     init() {
         do {
             self.realm = try Realm()
@@ -18,14 +18,14 @@ class RealmMovieRepository: MoviePersistenceProtocol {
             fatalError("Failed to initialize Realm: \(error)")
         }
     }
-    
+
     func saveMovies(_ movies: [MovieModel]) async throws {
         try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
                 do {
                     try realm.write {
                         for movie in movies {
-                            let realmMovie = RealmMovieObject.create(from: movie, filter: "default")
+                            let realmMovie = RealmMovieObject.create(from: movie)
                             realm.add(realmMovie, update: .all)
                         }
                     }
@@ -36,18 +36,16 @@ class RealmMovieRepository: MoviePersistenceProtocol {
             }
         }
     }
-    
-    func fetchMovies(filter: String = "default") async throws -> [MovieModel] {
+
+    func fetchMovies() async throws -> [MovieModel] {
         return try await withCheckedThrowingContinuation { continuation in
             let realmMovies = realm.objects(RealmMovieObject.self)
-                .filter(NSPredicate(format: "category == %@", filter))
-                .sorted(byKeyPath: "savedAt", ascending: false)
-            
+
             let movieModels = realmMovies.map { $0.toMovieModel() }
             continuation.resume(returning: Array(movieModels))
         }
     }
-    
+
     func clearMovies() async throws {
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
@@ -62,13 +60,30 @@ class RealmMovieRepository: MoviePersistenceProtocol {
             }
         }
     }
-    
+
+    func clearMovies(filter: String) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            Task { @MainActor in
+                do {
+                    let moviesToDelete = realm.objects(RealmMovieObject.self)
+                        .filter(NSPredicate(format: "category == %@", filter))
+                    try realm.write {
+                        realm.delete(moviesToDelete)
+                    }
+                    continuation.resume()
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
     func saveMovie(_ movie: MovieModel) async throws {
         try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
                 do {
                     try realm.write {
-                        let realmMovie = RealmMovieObject.create(from: movie, filter: "default")
+                        let realmMovie = RealmMovieObject.create(from: movie)
                         realm.add(realmMovie, update: .all)
                     }
                     continuation.resume()
@@ -78,7 +93,7 @@ class RealmMovieRepository: MoviePersistenceProtocol {
             }
         }
     }
-    
+
     func deleteMovie(id: Int) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in

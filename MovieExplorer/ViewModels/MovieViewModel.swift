@@ -14,22 +14,33 @@ class MovieViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var isPaginating: Bool = false
     @Published private(set) var movie: MovieDetailModel?
+    @Published var error: Error?
     private(set) var page = 0
     private(set) var hasMorePages = true
     private var movieService: MovieServiceProtocol?
     private let offlineMovieService = OfflineMovieService()
     private var currentFilter: String = Constants.popularKey
+    private var lastFetchFilter: String = Constants.popularKey
 
     init(movieService: MovieServiceProtocol? = nil) {
         self.movieService = movieService
         loadCachedMoviesOnLaunch()
+        checkNetworkConnection()
     }
 
     func fetchMovies(filter: String = Constants.popularKey) {
         currentFilter = filter
+        lastFetchFilter = filter
+
+        error = nil
 
         Task {
             await loadCachedMovies()
+        }
+
+        guard isNetworkAvailable() else {
+            error = NetworkError.noInternetConnection
+            return
         }
 
         guard !isPaginating && !isLoading && hasMorePages else { return }
@@ -45,6 +56,9 @@ class MovieViewModel: ObservableObject {
             do {
                 guard let moviesDTO = try await movieService?.fetchMovies(page: page, filter: filter) else {
                     resetLoadingStates()
+                    if movies.isEmpty {
+                        error = NetworkError.noData
+                    }
                     await loadCachedMovies()
                     return
                 }
@@ -65,10 +79,23 @@ class MovieViewModel: ObservableObject {
                 resetLoadingStates()
             } catch {
                 resetLoadingStates()
-                await loadCachedMovies()
-                print("Error fetching movies: \(error.localizedDescription)")
+                self.error = error
+                if error is NetworkError {
+                    await loadCachedMovies()
+                }
+
             }
         }
+    }
+
+    private func checkNetworkConnection() {
+        if !isNetworkAvailable() {
+            error = NetworkError.noInternetConnection
+        }
+    }
+
+    private func isNetworkAvailable() -> Bool {
+        return NetworkMonitor.shared.isConnected
     }
 
     private func loadCachedMoviesOnLaunch() {
@@ -78,11 +105,17 @@ class MovieViewModel: ObservableObject {
     }
 
     private func loadCachedMovies() async {
-        let cachedMovies = await offlineMovieService.getCachedMovies(filter: currentFilter)
+        let cachedMovies = await offlineMovieService.getCachedMovies()
         if !cachedMovies.isEmpty {
             await MainActor.run {
                 if self.page == 0 || self.movies.isEmpty {
                     self.movies = cachedMovies
+                }
+            }
+        } else if movies.isEmpty && error == nil && page == 0 {
+            await MainActor.run {
+                if !isNetworkAvailable() {
+                    self.error = NetworkError.noInternetConnection
                 }
             }
         }
@@ -90,8 +123,9 @@ class MovieViewModel: ObservableObject {
 
     func refreshMovies(filter: String = Constants.popularKey) {
         resetPagination()
+        error = nil
         Task {
-            await offlineMovieService.clearCache()
+            await offlineMovieService.clearMovies()
         }
         fetchMovies(filter: filter)
     }
@@ -105,20 +139,38 @@ class MovieViewModel: ObservableObject {
         page = 0
         hasMorePages = true
         movies.removeAll()
+        error = nil
     }
 
     func fetchMovieDetail(id: Int) {
+        error = nil
+
+        guard isNetworkAvailable() else {
+            error = NetworkError.noInternetConnection
+            return
+        }
+
         isLoading = true
         Task {
             do {
-                guard let movieDetailDTO = try await movieService?.fetchMovieDetail(id: id) else { return }
+                guard let movieDetailDTO = try await movieService?.fetchMovieDetail(id: id) else {
+                    self.error = NetworkError.noData
+                    isLoading = false
+                    return
+                }
                 self.movie = MovieDetailModel(movieDetailDTO: movieDetailDTO)
                 isLoading = false
             } catch {
+                self.error = error
                 isLoading = false
-                // TODO: Error Handling
-                print(error.localizedDescription)
             }
         }
     }
+
+    func retryLastOperation() {
+        if let filter = currentFilter as String? {
+            fetchMovies(filter: filter)
+        }
+    }
 }
+

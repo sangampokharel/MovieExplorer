@@ -21,12 +21,11 @@ class RealmMovieObject: Object {
     nonisolated override init() {}
 
     @MainActor
-    func configure(from movieModel: MovieModel, filter: String) {
+    func configure(from movieModel: MovieModel) {
         self.id = movieModel.id
         self.title = movieModel.movieName
         self.overview = movieModel.movieDescription
         self.posterPath = movieModel.imageUrl
-        self.category = filter
         self.savedAt = Date()
     }
     
@@ -40,9 +39,9 @@ class RealmMovieObject: Object {
     }
     
     @MainActor
-    static func create(from movieModel: MovieModel, filter: String) -> RealmMovieObject {
+    static func create(from movieModel: MovieModel) -> RealmMovieObject {
         let realmMovie = RealmMovieObject()
-        realmMovie.configure(from: movieModel, filter: filter)
+        realmMovie.configure(from: movieModel)
         return realmMovie
     }
 }

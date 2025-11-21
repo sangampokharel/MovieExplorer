@@ -4,40 +4,63 @@
 //
 //  Created by Ekbana on 20/11/2025.
 //
-
 import Foundation
 import Combine
 
+@MainActor
 class SearchViewModel: ObservableObject {
-    static let shared = SearchViewModel()
-    @Published private(set) var moviesSearchList: [MovieModel] = []
-    @Published private(set) var isLoading: Bool = false
-    private let service = SearchService()
-    
-    private init() {}
+    static let shared: SearchViewModel = {
+        let searchService: SearchServiceProtocol = SearchService()
+        return SearchViewModel(searchService: searchService)
+    }()
+
+    @Published var moviesSearchList: [MovieModel] = []
+    @Published var isLoading: Bool = false
+    @Published var error: Error?
+    private let searchService: SearchServiceProtocol
+    private var searchTask: Task<Void, Never>?
+
+    private init(searchService: SearchServiceProtocol) {
+        self.searchService = searchService
+    }
 
     func search(query: String) {
-        guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        searchTask?.cancel()
+
+        guard !query.isEmpty else {
             clearResults()
             return
         }
-        
-        isLoading = true
-        Task {
+
+        error = nil
+
+        guard NetworkMonitor.shared.isConnected else {
+            error = NetworkError.noInternetConnection
+            return
+        }
+
+        searchTask = Task {
+            isLoading = true
+
             do {
-                let searchResultsDtos = try await service.fetchSearchResults(query: query)
-                let mappedMovies = searchResultsDtos.map { MovieModel(movieDto: $0) }
-                self.moviesSearchList = mappedMovies
+                let moviesDTO = try await searchService.fetchSearchResults(query: query)
+                let newMovies = moviesDTO.map { MovieModel(movieDto: $0) }
+                moviesSearchList = newMovies
                 isLoading = false
             } catch {
+                self.error = NetworkError.searchError(query)
                 isLoading = false
-                print(error.localizedDescription)
             }
         }
     }
-    
+
     func clearResults() {
+        searchTask?.cancel()
         moviesSearchList.removeAll()
-        isLoading = false
+        error = nil
+    }
+
+    func retryLastSearch(query: String) {
+        search(query: query)
     }
 }

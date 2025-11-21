@@ -93,16 +93,15 @@ class MovieDetailsController: UIViewController {
     //MARK: Data Properties
     private let movieViewModel = MovieViewModel(movieService: MovieService())
     private var cancellables = Set<AnyCancellable>()
-
     var movieId:Int?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUp()
+        observe()
         if let movieId {
             movieViewModel.fetchMovieDetail(id: movieId)
         }
-        observe()
     }
 
     private func observe() {
@@ -124,6 +123,19 @@ class MovieDetailsController: UIViewController {
                 }
 
             }.store(in: &cancellables)
+
+        movieViewModel.$error
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                self.showError(error) { [weak self] in
+                    if let movieId = self?.movieId {
+                        self?.movieViewModel.fetchMovieDetail(id: movieId)
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func setUp() {

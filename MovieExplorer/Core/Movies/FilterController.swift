@@ -32,10 +32,8 @@ class FilterController: UIViewController {
 
     private(set) var selectedFilter: FiltersModel?
     
-    // Add completion closure property
     var onFilterSelected: ((FiltersModel) -> Void)?
     
-    // Add initializer to accept current filter
     init(currentFilter: FiltersModel? = nil) {
         super.init(nibName: nil, bundle: nil)
         setupFilters(with: currentFilter)
@@ -47,12 +45,9 @@ class FilterController: UIViewController {
     
     private func setupFilters(with currentFilter: FiltersModel?) {
         filters = FiltersModel.data.map { filter in
-            // Mark the filter as selected if it matches the current filter
             let isSelected = currentFilter?.key == filter.key
             return FiltersModel(title: filter.title, isSelected: isSelected, key: filter.key)
         }
-        
-        // Set the selected filter
         selectedFilter = filters.first { $0.isSelected } ?? filters.first
     }
 
@@ -63,8 +58,6 @@ class FilterController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        // Call the completion closure when the view controller is being dismissed
         if let selectedFilter = selectedFilter {
             onFilterSelected?(selectedFilter)
         }
@@ -115,7 +108,6 @@ class FilterController: UIViewController {
     @objc private func radioButtonTapped(_ sender: RadioButton) {
         let selectedIndex = sender.tag
         selectedFilter = filters[selectedIndex]
-        print("Selected filter: \(selectedFilter?.title ?? ""), key: \(selectedFilter?.key ?? "")")
     }
 
     func getCurrentFilter() -> FiltersModel? {

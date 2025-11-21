@@ -69,8 +69,13 @@ class MovieListController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setNavBar()
-        movieViewModel.fetchMovies(filter: currentFilter?.key ?? "popularity.desc")
+        movieViewModel.fetchMovies(filter: currentFilter?.key ?? Constants.popularKey)
         observeChanges()
+        setupNotifications()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     //MARK: Functions
@@ -143,7 +148,41 @@ class MovieListController: UIViewController {
                     self.tableView.tableFooterView = nil
                 }
             }.store(in: &cancellables)
-
+        
+        movieViewModel.$error
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                
+                if !self.movieViewModel.movies.isEmpty && error is NetworkError {
+                    return
+                }
+                
+                self.showError(error) { [weak self] in
+                    self?.movieViewModel.retryLastOperation()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOfflineMode),
+            name: .useOfflineMode,
+            object: nil
+        )
+    }
+    
+    @objc private func handleOfflineMode() {
+        Task {
+            await MainActor.run {
+                if self.movieViewModel.movies.isEmpty {
+                    self.showError(NetworkError.noData)
+                }
+            }
+        }
     }
 
     @objc
@@ -153,6 +192,12 @@ class MovieListController: UIViewController {
             guard let self else { return }
             if self.currentFilter?.key != selectedFilter.key {
                 self.currentFilter = selectedFilter
+                
+                guard NetworkMonitor.shared.isConnected else {
+                    self.showError(NetworkError.filterError(selectedFilter.title))
+                    return
+                }
+                
                 self.movieViewModel.resetPagination()
                 self.movieViewModel.fetchMovies(filter: selectedFilter.key)
             }
@@ -183,6 +228,11 @@ extension MovieListController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let threshold = movieViewModel.movies.count - 3
         if indexPath.row >= max(threshold, 0) && !movieViewModel.isPaginating && movieViewModel.hasMorePages {
+            
+            guard NetworkMonitor.shared.isConnected else {
+                return
+            }
+            
             movieViewModel.fetchMovies(filter: currentFilter?.key ?? Constants.popularKey)
         }
     }
