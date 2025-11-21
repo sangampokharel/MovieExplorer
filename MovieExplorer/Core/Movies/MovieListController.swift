@@ -252,12 +252,6 @@ extension MovieListController: UITableViewDelegate {
 
 extension MovieListController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        let query = searchController.searchBar.text ?? ""
-        debounceTimer?.invalidate()
-        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false) { [weak self] _ in
-            Task {
-                await self?.searchViewModel.search(query: query)
-            }
-        }
+        searchViewModel.searchText = searchController.searchBar.text ?? ""
     }
 }

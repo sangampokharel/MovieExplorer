@@ -88,7 +88,7 @@ class SearchController: UIViewController {
                 guard let self = self else { return }
                 if self.moviesSearchList.isEmpty {
                     self.showError(error) { [weak self] in
-                        self?.searchViewModel.retryLastSearch(query: self?.currentQuery ?? "")
+                        self?.searchViewModel.retryLastSearch()
                     }
                 }
             }
@@ -97,7 +97,7 @@ class SearchController: UIViewController {
 
     func searchMovies(query: String) {
         currentQuery = query
-        searchViewModel.search(query: query)
+        searchViewModel.searchText = query
     }
 
     func clearSearchResults() {
