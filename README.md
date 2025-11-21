@@ -57,9 +57,9 @@ Using Realm Swift for local storage:
 - Automatic Updates: update: .all policy for seamless data updates
 
 
-Created by Sangam Pokharel (November 2025)
+Created by **Sangam Pokharel** (November 2025)
 
-Acknowledgments
+## Acknowledgments
 - The Movie Database (TMDB) for providing movie data
 - Realm for the persistence layer
 - Apple's Combine framework for reactive programming
