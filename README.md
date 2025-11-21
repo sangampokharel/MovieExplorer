@@ -7,7 +7,6 @@ The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) de
 - Swift 6.2
 
 ## Core Components
-
 - MovieModel: The main data model representing a movie
 - MovieDTO: Data Transfer Object for API responses from TMDB
 - MovieViewModel: Handles business logic and state management
@@ -25,6 +24,7 @@ The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) de
 - Filtering: Bottom sheet with radio button selection for sorting
 - Loading States: Activity indicators for initial load and pagination
 - Error Handling: User-friendly alerts with retry options
+- Theming: Supports dark & Light Themes
 
 # 🌐 Network Layer
 - API Integration: TMDB API endpoints for popular, revenue, and top voted movies
