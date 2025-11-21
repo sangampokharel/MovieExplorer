@@ -26,10 +26,10 @@ The app follows a clean architecture pattern with MVVM (Model-View-ViewModel) de
 - Loading States: Activity indicators for initial load and pagination
 - Error Handling: User-friendly alerts with retry options
 
-🌐 Network Layer
-• API Integration: TMDB API endpoints for popular, revenue, and top voted movies
-• Pagination: Automatic loading of additional pages as user scrolls
-• Network Monitoring: Detects connectivity changes and switches to offline mode
+# 🌐 Network Layer
+- API Integration: TMDB API endpoints for popular, revenue, and top voted movies
+- Pagination: Automatic loading of additional pages as user scrolls
+- Network Monitoring: Detects connectivity changes and switches to offline mode
 
 💾 Offline Support
 - Automatic Caching: Movies are cached locally for offline viewing
